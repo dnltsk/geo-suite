@@ -1,0 +1,19 @@
+{
+  "name": "dataproofer-geo-suite",
+  "version": "0.1.0",
+  "description": "Suite of advanced statistics tests for dataproofer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "data",
+    "csv",
+    "excel"
+  ],
+  "author": "DataProofer",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.0.0"
+  }
+}
