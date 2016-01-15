@@ -1,5 +1,5 @@
 # geo-suite
-Suite of advanced stastical tests for DataProofer
+Suite of geographic and mapping related tests for DataProofer
 
 ## Writing tests
 

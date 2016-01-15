@@ -1,7 +1,7 @@
 {
   "name": "dataproofer-geo-suite",
   "version": "0.1.0",
-  "description": "Suite of advanced statistics tests for dataproofer",
+  "description": "Suite of geographic and mapping related tests for dataproofer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
