@@ -22,19 +22,25 @@ validLngLat.name('Valid longitude and latitude values')
     var potentialDoubleCoordinates = [
       'latlon', 'latitude/longitude', 'longitude/latitude', 'lonlat', 'lnglat'
     ]
-    var potentialSingleCoordinates = [
-      'latitude', 'longitude', 'lat', 'lng', 'lon', 'long'
+    var potentialLats = [
+      'latitude', 'lat',
+    ]
+    var potentialLons = [
+      'longitude', 'lng', 'lon', 'long'
     ]
     // keep track of the columns which match our criteria
     var doubleColumns = [];
-    var singleColumns = [];
+    var latColumns = [];
+    var lonColumns = [];
     // NOTE: in the future the selectedColumns might override this
     columnHeads.forEach(function(column) {
       var lower = column.toLowerCase()
       if(potentialDoubleCoordinates.indexOf(lower) >= 0) {
         doubleColumns.push(column)
-      } else if(potentialSingleCoordinates.indexOf(lower) >= 0 || lower.indexOf('latitude') >= 0 || lower.indexOf('longitude') >= 0) {
-        singleColumns.push(column)
+      } else if(potentialLats.indexOf(lower) >= 0 || lower.indexOf('latitude') >= 0 ) {
+        latColumns.push(column)
+      } else if(potentialLons.indexOf(lower) >= 0 || lower.indexOf('longitude') >= 0) {
+        lonColumns.push(column)
       }
     })
 
@@ -44,7 +50,7 @@ validLngLat.name('Valid longitude and latitude values')
     })
     var cells = [];
     var passed = true;
-    if(singleColumns.length || doubleColumns.length) {
+    if(latColumns.length || lonColumns.length || doubleColumns.length) {
       rows.forEach(function(row) {
         var highlightRow = {}
         doubleColumns.forEach(function(column) {
@@ -54,6 +60,11 @@ validLngLat.name('Valid longitude and latitude values')
             var num1 = parseFloat(coords[0])
             var num2 = parseFloat(coords[1])
             if(num1 > 180 || num2 > 180 || num1 < -180 || num2 < -180) {
+              passed = false;
+              invalidCoords[column] += 1;
+              highlightRow[column] = 1;
+            } else if(num1 === 0 && num2 === 0) {
+              // null island
               passed = false;
               invalidCoords[column] += 1;
               highlightRow[column] = 1;
@@ -67,10 +78,19 @@ validLngLat.name('Valid longitude and latitude values')
             highlightRow[column] = 1;
           }
         })
-        singleColumns.forEach(function(column) {
+        // we want to know if both columns are zero to detect null island
+        var zeros = {
+          "lat": false,
+          "lon": false
+        }
+        // checks a single column (either lat or lon)
+        // we break it out into this function so we can iterate over
+        // the columns which are suspected to be lat/lon
+        function checkColumn(column, latlon) {
           var cell = row[column];
           if(util.isEmpty(cell)) {
             // if the cell is empty its definitely not a valid lat/lon
+            passed = false;
             invalidCoords[column] += 1;
             highlightRow[column] = 1;
           } else if(util.isNumeric(cell)) {
@@ -81,12 +101,33 @@ validLngLat.name('Valid longitude and latitude values')
               invalidCoords[column] += 1;
               highlightRow[column] = 1;
             } else {
+              if(num === 0) {
+                zeros[latlon] = column;
+              }
               highlightRow[column] = 0;
             }
           } else {
-            highlightRow[column] = 0;
+            // this test could be overly aggressive if we wrongly guess
+            // that a column contains lat/lon by name only
+            passed = false;
+            invalidCoords[column] += 1;
+            highlightRow[column] = 1;
+            //highlightRow[column] = 0;
           }
+        }
+        lonColumns.forEach(function(column) {
+          checkColumn(column, "lon")
         });
+        latColumns.forEach(function(column) {
+          checkColumn(column, "lat")
+        });
+        if(zeros.lon && zeros.lat) {
+          passed = false;
+          invalidCoords[zeros.lon] += 1;
+          invalidCoords[zeros.lat] += 1;
+          highlightRow[zeros.lon] = 1
+          highlightRow[zeros.lat] = 1
+        }
         cells.push(highlightRow)
       })
     }
