@@ -1,0 +1,115 @@
+var _ = require('lodash');
+var DataprooferTest = require('dataproofertest-js');
+var util = require('dataproofertest-js/util')
+var validLngLat = new DataprooferTest();
+
+var percent = function percent(fraction) {
+  var formatPercent = d3.format('.2f')
+  return formatPercent(100*fraction) + "%";
+}
+
+/**
+ * Verify that columns assumed to contain longitude or latitudes have valid values
+ *
+ * @param  {Array} rows - an array of objects representing rows in the spreadsheet
+ * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
+ * @return {Object} result an object describing the result
+ */
+validLngLat.name('Valid longitude and latitude values')
+  .description('Check for valid longitude and latitude values in columns presumed to contain geographic coordinates')
+  .methodology(function(rows, columnHeads) {
+    // Search for columns that could have longitude and/or latitude values
+    var potentialDoubleCoordinates = [
+      'latlon', 'latitude/longitude', 'longitude/latitude', 'lonlat', 'lnglat'
+    ]
+    var potentialSingleCoordinates = [
+      'latitude', 'longitude', 'lat', 'lng', 'lon', 'long'
+    ]
+    // keep track of the columns which match our criteria
+    var doubleColumns = [];
+    var singleColumns = [];
+    // NOTE: in the future the selectedColumns might override this
+    columnHeads.forEach(function(column) {
+      var lower = column.toLowerCase()
+      if(potentialDoubleCoordinates.indexOf(lower) >= 0) {
+        doubleColumns.push(column)
+      } else if(potentialSingleCoordinates.indexOf(lower) >= 0 || lower.indexOf('latitude') >= 0 || lower.indexOf('longitude') >= 0) {
+        singleColumns.push(column)
+      }
+    })
+
+    var invalidCoords = {};
+    columnHeads.forEach(function(column) {
+      invalidCoords[column] = 0;
+    })
+    var cells = [];
+    var passed = true;
+    if(singleColumns.length || doubleColumns.length) {
+      rows.forEach(function(row) {
+        var highlightRow = {}
+        doubleColumns.forEach(function(column) {
+          var cell = row[column];
+          if (typeof(cell) === "string") {
+            var coords = cell.split(",")
+            var num1 = parseFloat(coords[0])
+            var num2 = parseFloat(coords[1])
+            if(num1 > 180 || num2 > 180 || num1 < -180 || num2 < -180) {
+              passed = false;
+              invalidCoords[column] += 1;
+              highlightRow[column] = 1;
+            } else {
+              highlightRow[column] = 0;
+            }
+          } else {
+            // this isn't in a format we recognize
+            passed = false;
+            invalidCoords[column] += 1;
+            highlightRow[column] = 1;
+          }
+        })
+        singleColumns.forEach(function(column) {
+          var cell = row[column];
+          if(util.isEmpty(cell)) {
+            // if the cell is empty its definitely not a valid lat/lon
+            invalidCoords[column] += 1;
+            highlightRow[column] = 1;
+          } else if(util.isNumeric(cell)) {
+            // if the cell has a numeric value, we check to make sure its in the valid range
+            var num = parseFloat(cell);
+            if(num > 180 || num < -180) {
+              passed = false;
+              invalidCoords[column] += 1;
+              highlightRow[column] = 1;
+            } else {
+              highlightRow[column] = 0;
+            }
+          } else {
+            highlightRow[column] = 0;
+          }
+        });
+        cells.push(highlightRow)
+      })
+    }
+
+    var summary = _.template(`
+      <% _.forEach(columnHeads, function(columnHead) { %>
+        <% if(invalidCoords[columnHead]) { %>
+        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid lat/lon coordinates (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span><br/>
+        <% } %>
+      <% }) %>
+    `)({
+      columnHeads: columnHeads,
+      invalidCoords: invalidCoords,
+      rows: rows,
+      percent: percent
+    });
+
+    var result = {
+      passed: passed, // this doesn't really fail, as it is mostly an insight
+      summary: summary,
+      highlightCells: cells
+    }
+    return result;
+  })
+
+module.exports = validLngLat;
