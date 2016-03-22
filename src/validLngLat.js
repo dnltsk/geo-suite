@@ -53,6 +53,7 @@ validLngLat.name('Valid longitude and latitude values')
     if(latColumns.length || lonColumns.length || doubleColumns.length) {
       rows.forEach(function(row) {
         var highlightRow = {}
+        columnHeads.forEach(function(column) { highlightRow[column] = 0})
         doubleColumns.forEach(function(column) {
           var cell = row[column];
           if (typeof(cell) === "string") {
