@@ -15,7 +15,7 @@ var percent = function percent(fraction) {
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
  * @return {Object} result an object describing the result
  */
-validLngLat.name('Invalid longitude and latitude values')
+validLngLat.name('Invalid coordinates')
   .description('Check for invalid longitude and latitude values in columns presumed to contain geographic coordinates')
   .methodology(function(rows, columnHeads) {
     // Search for columns that could have longitude and/or latitude values
@@ -61,11 +61,6 @@ validLngLat.name('Invalid longitude and latitude values')
             var num1 = parseFloat(coords[0])
             var num2 = parseFloat(coords[1])
             if(num1 > 180 || num2 > 180 || num1 < -180 || num2 < -180) {
-              passed = false;
-              invalidCoords[column] += 1;
-              highlightRow[column] = 1;
-            } else if(num1 === 0 && num2 === 0) {
-              // null island
               passed = false;
               invalidCoords[column] += 1;
               highlightRow[column] = 1;
@@ -136,7 +131,7 @@ validLngLat.name('Invalid longitude and latitude values')
     var summary = _.template(`
       <% _.forEach(columnHeads, function(columnHead) { %>
         <% if(invalidCoords[columnHead]) { %>
-        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid latitudes and longitudes (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span>. These are values above 180º, below -180º, or at 0º,0º.<br/>
+        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid latitudes and longitudes (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span>. These are values above 180º or below -180º<br/>
         <% } %>
       <% }) %>
     `)({

@@ -6,7 +6,10 @@ exports = module.exports = {
   subtests: [],   // a list of tests that can be triggered by the main tests but wont be run automatically
 }
 
-var validLngLat= require('./src/validLngLat');
+var validLngLat = require('./src/validLngLat');
+var voidLngLat = require('./src/voidLngLat');
+
 exports.tests.push(
-  validLngLat
+  validLngLat,
+  voidLngLat
 );
