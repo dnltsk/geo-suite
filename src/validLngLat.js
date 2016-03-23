@@ -136,7 +136,7 @@ validLngLat.name('Invalid longitude and latitude values')
     var summary = _.template(`
       <% _.forEach(columnHeads, function(columnHead) { %>
         <% if(invalidCoords[columnHead]) { %>
-        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid lat/lon coordinates (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span><br/>
+        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid latitudes and longitudes (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span>. These are values above 180º, below -180º, or at 0º,0º a center location many geocoders may default to if they're unable to locate an address.<br/>
         <% } %>
       <% }) %>
     `)({
