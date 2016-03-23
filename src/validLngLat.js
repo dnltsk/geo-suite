@@ -15,8 +15,8 @@ var percent = function percent(fraction) {
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
  * @return {Object} result an object describing the result
  */
-validLngLat.name('Valid longitude and latitude values')
-  .description('Check for valid longitude and latitude values in columns presumed to contain geographic coordinates')
+validLngLat.name('Invalid longitude and latitude values')
+  .description('Check for invalid longitude and latitude values in columns presumed to contain geographic coordinates')
   .methodology(function(rows, columnHeads) {
     // Search for columns that could have longitude and/or latitude values
     var potentialDoubleCoordinates = [
