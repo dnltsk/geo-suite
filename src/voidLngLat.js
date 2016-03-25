@@ -5,7 +5,8 @@ var voidLngLat = new DataprooferTest();
 
 
 /**
- * Verify that columns assumed to contain longitude or latitudes have non-zero values
+ * Verify that columns assumed to contain longitude or latitudes have non-zero values.
+ * These are values at 0º,0º.
  *
  * @param  {Array} rows - an array of objects representing rows in the spreadsheet
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet

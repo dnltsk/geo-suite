@@ -4,7 +4,8 @@ var util = require('dataproofertest-js/util')
 var validLngLat = new DataprooferTest();
 
 /**
- * Verify that columns assumed to contain longitude or latitudes have valid values
+ * Verify that columns assumed to contain longitude or latitudes have valid values.
+ * These are values above 180º or below -180º.
  *
  * @param  {Array} rows - an array of objects representing rows in the spreadsheet
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
