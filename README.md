@@ -5,6 +5,15 @@ Suite of geographic and mapping related tests for Dataproofer
 * [Repository](https://github.com/dataproofer/geo-suite/)
 * [Issues](https://github.com/dataproofer/geo-suite/issues)
 
+## Table of Contents
+
+* [Tests](https://github.com/dataproofer/geo-suite#tests)
+ * [voidLngLat.js](https://github.com/dataproofer/geo-suite#voidlnglatjs)
+ * [validLngLat.js](https://github.com/dataproofer/geo-suite#validlnglatjs)
+* [Development](https://github.com/dataproofer/geo-suite#development)
+  * [Getting started](https://github.com/dataproofer/geo-suite#getting-started)
+  * [Documentation](https://github.com/dataproofer/geo-suite#documentation)
+
 ## Tests
 
 ### voidLngLat.js
