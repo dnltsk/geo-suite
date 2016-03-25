@@ -11,8 +11,9 @@ Suite of geographic and mapping related tests for Dataproofer
  * [voidLngLat.js](https://github.com/dataproofer/geo-suite#voidlnglatjs)
  * [validLngLat.js](https://github.com/dataproofer/geo-suite#validlnglatjs)
 * [Development](https://github.com/dataproofer/geo-suite#development)
-  * [Getting started](https://github.com/dataproofer/geo-suite#getting-started)
-  * [Documentation](https://github.com/dataproofer/geo-suite#documentation)
+  * [Getting Started](https://github.com/dataproofer/geo-suite#getting-started)
+  * [Writing Tests](https://github.com/dataproofer/stats-suite#writing-tests)
+  * [Building Docs](https://github.com/dataproofer/geo-suite#building-docs)
 
 ## Tests
 
@@ -55,17 +56,28 @@ Returns **Object** result an object describing the result
 
 ## Development
 
-### Getting started
+### Getting Started
 
 ```
-git clone git@github.com:dataproofer/dataproofertest-js.git
-cd dataproofertest-js
+git clone git@github.com:dataproofer/geo-suite.git
+cd geo-suite
 npm install
 ```
-### Documentation
+
+### Writing Tests
+
+* [How To](https://github.com/dataproofer/Dataproofer#creating-a-new-test)
+* [Helper Scripts](https://github.com/dataproofer/dataproofertest-js/blob/master/DOCUMENTATION.md#util)
+* Templates
+  * [Basic Test](https://github.com/dataproofer/suite-template/blob/master/src/myTest.js)
+  * [Advanced Test](https://github.com/dataproofer/suite-template/blob/master/src/myAdvancedTest.js)
+
+### Building Docs
 
 We use [documentation.js](https://github.com/documentationjs/documentation), but have created a handy script for regenerating documentation.
 
 ```
 npm run docs
 ```
+
+Then open up and check your docs in [DOCUMENTATION.md](https://github.com/dataproofer/info-suite/blob/master/DOCUMENTATION.md)
