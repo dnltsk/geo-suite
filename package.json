@@ -11,7 +11,7 @@
     "csv",
     "excel"
   ],
-  "author": "DataProofer",
+  "author": "DataProofer <dataproofer@dataproofer.org>",
   "license": "GNU GPL",
   "dependencies": {
     "lodash": "^4.0.0",
