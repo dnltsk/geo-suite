@@ -11,8 +11,8 @@
     "csv",
     "excel"
   ],
-  "author": "DataProofer",
-  "license": "ISC",
+  "author": "DataProofer <dataproofer@dataproofer.org>",
+  "license": "GNU GPL",
   "dependencies": {
     "lodash": "^4.0.0",
     "dataproofertest": "git@github.com:dataproofer/dataproofertest.js.git"
