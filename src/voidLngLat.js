@@ -3,10 +3,6 @@ var DataprooferTest = require('dataproofertest-js');
 var util = require('dataproofertest-js/util')
 var voidLngLat = new DataprooferTest();
 
-var percent = function percent(fraction) {
-  var formatPercent = d3.format('.2f')
-  return formatPercent(100*fraction) + "%";
-}
 
 /**
  * Verify that columns assumed to contain longitude or latitudes have non-zero values
@@ -133,7 +129,7 @@ voidLngLat.name('Void coordinates')
       columnHeads: columnHeads,
       voidCoords: voidCoords,
       rows: rows,
-      percent: percent
+      percent: util.percent
     });
 
     var result = {
