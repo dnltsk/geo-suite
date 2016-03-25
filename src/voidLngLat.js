@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var DataprooferTest = require('dataproofertest-js');
 var util = require('dataproofertest-js/util')
-var validLngLat = new DataprooferTest();
+var voidLngLat = new DataprooferTest();
 
 var percent = function percent(fraction) {
   var formatPercent = d3.format('.2f')
@@ -9,14 +9,14 @@ var percent = function percent(fraction) {
 }
 
 /**
- * Verify that columns assumed to contain longitude or latitudes have valid values
+ * Verify that columns assumed to contain longitude or latitudes have non-zero values
  *
  * @param  {Array} rows - an array of objects representing rows in the spreadsheet
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
  * @return {Object} result an object describing the result
  */
-validLngLat.name('Invalid coordinates')
-  .description('Check for invalid longitude and latitude values in columns presumed to contain geographic coordinates')
+voidLngLat.name('Void coordinates')
+  .description('Check for non-existent longitude and latitude values in columns presumed to contain geographic coordinates')
   .methodology(function(rows, columnHeads) {
     // Search for columns that could have longitude and/or latitude values
     var potentialDoubleCoordinates = [
@@ -44,9 +44,9 @@ validLngLat.name('Invalid coordinates')
       }
     })
 
-    var invalidCoords = {};
+    var voidCoords = {};
     columnHeads.forEach(function(column) {
-      invalidCoords[column] = 0;
+      voidCoords[column] = 0;
     })
     var cells = [];
     var passed = true;
@@ -60,9 +60,10 @@ validLngLat.name('Invalid coordinates')
             var coords = cell.split(",")
             var num1 = parseFloat(coords[0])
             var num2 = parseFloat(coords[1])
-            if(num1 > 180 || num2 > 180 || num1 < -180 || num2 < -180) {
+            if(num1 === 0 && num2 === 0) {
+              // null island
               passed = false;
-              invalidCoords[column] += 1;
+              voidCoords[column] += 1;
               highlightRow[column] = 1;
             } else {
               highlightRow[column] = 0;
@@ -70,7 +71,7 @@ validLngLat.name('Invalid coordinates')
           } else {
             // this isn't in a format we recognize
             passed = false;
-            invalidCoords[column] += 1;
+            voidCoords[column] += 1;
             highlightRow[column] = 1;
           }
         })
@@ -87,26 +88,20 @@ validLngLat.name('Invalid coordinates')
           if(util.isEmpty(cell)) {
             // if the cell is empty its definitely not a valid lat/lon
             passed = false;
-            invalidCoords[column] += 1;
+            voidCoords[column] += 1;
             highlightRow[column] = 1;
           } else if(util.isNumeric(cell)) {
             // if the cell has a numeric value, we check to make sure its in the valid range
             var num = parseFloat(cell);
-            if(num > 180 || num < -180) {
-              passed = false;
-              invalidCoords[column] += 1;
-              highlightRow[column] = 1;
-            } else {
-              if(num === 0) {
-                zeros[latlon] = column;
-              }
-              highlightRow[column] = 0;
+            if(num === 0) {
+              zeros[latlon] = column;
             }
+            highlightRow[column] = 0;
           } else {
             // this test could be overly aggressive if we wrongly guess
             // that a column contains lat/lon by name only
             passed = false;
-            invalidCoords[column] += 1;
+            voidCoords[column] += 1;
             highlightRow[column] = 1;
             //highlightRow[column] = 0;
           }
@@ -119,8 +114,8 @@ validLngLat.name('Invalid coordinates')
         });
         if(zeros.lon && zeros.lat) {
           passed = false;
-          invalidCoords[zeros.lon] += 1;
-          invalidCoords[zeros.lat] += 1;
+          voidCoords[zeros.lon] += 1;
+          voidCoords[zeros.lat] += 1;
           highlightRow[zeros.lon] = 1
           highlightRow[zeros.lat] = 1
         }
@@ -130,13 +125,13 @@ validLngLat.name('Invalid coordinates')
 
     var summary = _.template(`
       <% _.forEach(columnHeads, function(columnHead) { %>
-        <% if(invalidCoords[columnHead]) { %>
-        We found <span class="test-value"><%= invalidCoords[columnHead] %></span> invalid latitudes and longitudes (<%= percent(invalidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span>. These are values above 180º or below -180º<br/>
+        <% if(voidCoords[columnHead]) { %>
+        We found <span class="test-value"><%= voidCoords[columnHead] %></span> void latitudes and longitudes (<%= percent(voidCoords[columnHead]/rows.length) %>) for column <span class="test-column"><%= columnHead %></span>. These are values at 0º,0º.<br/>
         <% } %>
       <% }) %>
     `)({
       columnHeads: columnHeads,
-      invalidCoords: invalidCoords,
+      voidCoords: voidCoords,
       rows: rows,
       percent: percent
     });
@@ -149,4 +144,4 @@ validLngLat.name('Invalid coordinates')
     return result;
   })
 
-module.exports = validLngLat;
+module.exports = voidLngLat;
