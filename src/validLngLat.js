@@ -9,7 +9,7 @@ var validLngLat = new DataprooferTest();
  *
  * @param  {Array} rows - an array of objects representing rows in the spreadsheet
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
- * @return {Object} result an object describing the result
+ * @return {Object} describing the result
  */
 validLngLat.name('Invalid coordinates')
   .description('Check for invalid longitude and latitude values in columns presumed to contain geographic coordinates')
