@@ -19,7 +19,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "lodash": "^4.0.0",
-    "dataproofertest": "git@github.com:dataproofer/dataproofertest.js.git"
+    "dataproofertest": "https://github.com/dataproofer/dataproofertest.js.git"
   },
   "devDependencies": {
     "documentation": "^3.0.4"
