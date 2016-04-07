@@ -20,10 +20,10 @@ voidLngLat.name('Void coordinates')
       'latlon', 'latitude/longitude', 'longitude/latitude', 'lonlat', 'lnglat'
     ]
     var potentialLats = [
-      'latitude', 'lat',
+      'latitude', 'lat', 'y'
     ]
     var potentialLons = [
-      'longitude', 'lng', 'lon', 'long'
+      'longitude', 'lng', 'lon', 'long', 'x'
     ]
     // keep track of the columns which match our criteria
     var doubleColumns = [];

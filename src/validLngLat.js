@@ -3,6 +3,7 @@ var DataprooferTest = require('dataproofertest-js');
 var util = require('dataproofertest-js/util')
 var validLngLat = new DataprooferTest();
 
+
 /**
  * Verify that columns assumed to contain longitude or latitudes have valid values.
  * These are values above 180º or below -180º.
@@ -19,10 +20,10 @@ validLngLat.name('Invalid coordinates')
       'latlon', 'latitude/longitude', 'longitude/latitude', 'lonlat', 'lnglat'
     ]
     var potentialLats = [
-      'latitude', 'lat',
+      'latitude', 'lat', 'y'
     ]
     var potentialLons = [
-      'longitude', 'lng', 'lon', 'long'
+      'longitude', 'lng', 'lon', 'long', 'x'
     ]
     // keep track of the columns which match our criteria
     var doubleColumns = [];
