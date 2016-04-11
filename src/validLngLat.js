@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var DataprooferTest = require('dataproofertest-js');
-var util = require('dataproofertest-js/util')
+var util = require('dataproofertest-js/util');
 var validLngLat = new DataprooferTest();
 
 
@@ -16,61 +16,54 @@ validLngLat.name('Invalid coordinates')
   .description('Check for invalid longitude and latitude values in columns presumed to contain geographic coordinates')
   .methodology(function(rows, columnHeads) {
     // Search for columns that could have longitude and/or latitude values
-    var potentialDoubleCoordinates = [
-      'latlon', 'latitude/longitude', 'longitude/latitude', 'lonlat', 'lnglat'
-    ]
+    var potentialLonLatColumns = [
+      'longitude/latitude', 'lonlat', 'lnglat', 'x/y'
+    ];
+    var potentialLatLonColumns = [
+      'latitude/longitude', 'latlon', 'latlng', 'y/x'
+    ];
+    var potentialCombinedColumns = potentialLatLonColumns.concat(potentialLonLatColumns);
     var potentialLats = [
       'latitude', 'lat', 'y'
-    ]
+    ];
     var potentialLons = [
       'longitude', 'lng', 'lon', 'long', 'x'
-    ]
+    ];
+
+    function isValidLat(lat){
+      return Math.abs(parseFloat(lat)) <= 180;
+    }
+
+    function isValidLon(lon){
+      return Math.abs(parseFloat(lon)) <= 90;
+    }
+
     // keep track of the columns which match our criteria
-    var doubleColumns = [];
+    var latLonColumns = [];
+    var lonLatColumns = [];
     var latColumns = [];
     var lonColumns = [];
     // NOTE: in the future the selectedColumns might override this
     columnHeads.forEach(function(column) {
-      var lower = column.toLowerCase()
-      if(potentialDoubleCoordinates.indexOf(lower) >= 0) {
-        doubleColumns.push(column)
-      } else if(potentialLats.indexOf(lower) >= 0 || lower.indexOf('latitude') >= 0 ) {
+      var lower = column.toLowerCase();
+      if(potentialLatLonColumns.indexOf(lower) >= 0) {
+        latLonColumns.push(column);
+      }else if(potentialLonLatColumns.indexOf(lower) >= 0) {
+        lonLatColumns.push(column);
+      } else if(potentialLats.indexOf(lower) >= 0) {
         latColumns.push(column)
-      } else if(potentialLons.indexOf(lower) >= 0 || lower.indexOf('longitude') >= 0) {
+      } else if(potentialLons.indexOf(lower) >= 0) {
         lonColumns.push(column)
       }
-    })
+    });
 
     var invalidCoords = {};
-    columnHeads.forEach(function(column) {
-      invalidCoords[column] = 0;
-    })
+    columnHeads.forEach(function(column) { invalidCoords[column] = 0; });
     var cells = [];
     var passed = true;
-    if(latColumns.length || lonColumns.length || doubleColumns.length) {
+    if(latLonColumns.length || lonLatColumns.length || lonColumns.length || latColumns.length ) {
       rows.forEach(function(row) {
-        var highlightRow = {}
-        columnHeads.forEach(function(column) { highlightRow[column] = 0})
-        doubleColumns.forEach(function(column) {
-          var cell = row[column];
-          if (typeof(cell) === "string") {
-            var coords = cell.split(",")
-            var num1 = parseFloat(coords[0])
-            var num2 = parseFloat(coords[1])
-            if(num1 > 180 || num2 > 180 || num1 < -180 || num2 < -180) {
-              passed = false;
-              invalidCoords[column] += 1;
-              highlightRow[column] = 1;
-            } else {
-              highlightRow[column] = 0;
-            }
-          } else {
-            // this isn't in a format we recognize
-            passed = false;
-            invalidCoords[column] += 1;
-            highlightRow[column] = 1;
-          }
-        })
+
         // we want to know if both columns are zero to detect null island
         var zeros = {
           "lat": false,
@@ -89,7 +82,8 @@ validLngLat.name('Invalid coordinates')
           } else if(util.isNumeric(cell)) {
             // if the cell has a numeric value, we check to make sure its in the valid range
             var num = parseFloat(cell);
-            if(num > 180 || num < -180) {
+            if((latlon == "lat" && Math.abs(num) > 180)
+               || latlon == "lon" && Math.abs(num) > 90) {
               passed = false;
               invalidCoords[column] += 1;
               highlightRow[column] = 1;
@@ -105,21 +99,44 @@ validLngLat.name('Invalid coordinates')
             passed = false;
             invalidCoords[column] += 1;
             highlightRow[column] = 1;
-            //highlightRow[column] = 0;
           }
         }
+
+        //reset
+        var highlightRow = {};
+        columnHeads.forEach(function(column) { highlightRow[column] = 0});
+
+        //checking
+        lonLatColumns.forEach(function(column) {
+          var cell = row[column];
+          if (typeof(cell) === "string") {
+            var coords = cell.split(",");
+            checkColumn(coords[0], "lon");
+            checkColumn(coords[1], "lat");
+          }
+        });
+        latLonColumns.forEach(function(column) {
+          var cell = row[column];
+          if (typeof(cell) === "string") {
+            var coords = cell.split(",");
+            checkColumn(coords[0], "lat");
+            checkColumn(coords[1], "lon");
+          }
+        });
         lonColumns.forEach(function(column) {
           checkColumn(column, "lon")
         });
         latColumns.forEach(function(column) {
           checkColumn(column, "lat")
         });
+
+        //highlighting
         if(zeros.lon && zeros.lat) {
           passed = false;
           invalidCoords[zeros.lon] += 1;
           invalidCoords[zeros.lat] += 1;
-          highlightRow[zeros.lon] = 1
-          highlightRow[zeros.lat] = 1
+          highlightRow[zeros.lon] = 1;
+          highlightRow[zeros.lat] = 1;
         }
         cells.push(highlightRow)
       })
@@ -142,8 +159,8 @@ validLngLat.name('Invalid coordinates')
       passed: passed, // this doesn't really fail, as it is mostly an insight
       summary: summary,
       highlightCells: cells
-    }
+    };
     return result;
-  })
+  });
 
 module.exports = validLngLat;
