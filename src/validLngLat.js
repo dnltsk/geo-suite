@@ -6,7 +6,8 @@ var validLngLat = new DataprooferTest();
 
 /**
  * Verify that columns assumed to contain longitude or latitudes have valid values.
- * These are values above 180º or below -180º.
+ * These are values with a latitude between -180º and 180º
+ * and a longitude between -90º and 90º
  *
  * @param  {Array} rows - an array of objects representing rows in the spreadsheet
  * @param  {Array} columnHeads - an array of strings for column names of the spreadsheet
@@ -22,21 +23,12 @@ validLngLat.name('Invalid coordinates')
     var potentialLatLonColumns = [
       'latitude/longitude', 'latlon', 'latlng', 'y/x'
     ];
-    var potentialCombinedColumns = potentialLatLonColumns.concat(potentialLonLatColumns);
     var potentialLats = [
       'latitude', 'lat', 'y'
     ];
     var potentialLons = [
       'longitude', 'lng', 'lon', 'long', 'x'
     ];
-
-    function isValidLat(lat){
-      return Math.abs(parseFloat(lat)) <= 180;
-    }
-
-    function isValidLon(lon){
-      return Math.abs(parseFloat(lon)) <= 90;
-    }
 
     // keep track of the columns which match our criteria
     var latLonColumns = [];
@@ -102,7 +94,7 @@ validLngLat.name('Invalid coordinates')
           }
         }
 
-        //reset
+        //reset notification
         var highlightRow = {};
         columnHeads.forEach(function(column) { highlightRow[column] = 0});
 
@@ -130,7 +122,7 @@ validLngLat.name('Invalid coordinates')
           checkColumn(column, "lat")
         });
 
-        //highlighting
+        //notify
         if(zeros.lon && zeros.lat) {
           passed = false;
           invalidCoords[zeros.lon] += 1;
